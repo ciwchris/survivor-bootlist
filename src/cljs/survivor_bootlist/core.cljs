@@ -6,8 +6,8 @@
 ;; State
 
 (def contestants (atom [
-                        {:id 1 :name "Carolyn" :out 17 :tribe "masaya"}
-                        {:id 2 :name "Dan" :out 18 :tribe "escameca"}
+                        {:id 1 :name "Carolyn" :out 18 :tribe "masaya"}
+                        {:id 2 :name "Dan" :out 0 :tribe "escameca"}
                         {:id 3 :name "Hali" :out 0 :tribe "nagarote"}
                         {:id 4 :name "Jenn" :out 0 :tribe "nagarote"}
                         {:id 5 :name "Joaquin" :out 0 :tribe "masaya"}
@@ -25,11 +25,11 @@
                         {:id 17 :name "Vince" :out 0 :tribe "nagarote"}
                         {:id 18 :name "Will" :out 0 :tribe "nagarote"}
                         ]))
-
+;; place they went out minus place you had the going out
 (def entries (atom [
-                    {:id 1 :name "phil" :points 0 :order [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
-                    {:id 2 :name "will" :points 0 :order [2 1 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
-                    {:id 3 :name "ciwchris" :points 0 :order [3 1 2 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
+                    {:id 1 :name "phil" :points 0 :order [18 17 16 15 14 13 12 11 1 10 9 8 7 6 5 4 3 2]}
+                    {:id 2 :name "will" :points 0 :order [2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 1]}
+                    {:id 3 :name "ciwchris" :points 0 :order [4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 1 2 3]}
                     {:id 11 :name "last" :points 0 :order [3 1 2 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
                     ]))
 
@@ -52,6 +52,32 @@
                          [:img {:src (str "/images/" (:name item) ".png")}]
                          [:div (:name item)]])])
 
+(defn create-contestant-list [entries selected-entry contestants]
+  (let [contestant-order (:order (first (filter #(= selected-entry (:id %)) entries)))]
+    (map
+     #(first (filter (fn [contestant] (= (:id contestant) %)) contestants))
+     contestant-order)))
+
+(defn calculate-points-for-entry
+  ([entry] (calculate-points-for-entry 0 18 entry ))
+  ([points max-points entry]
+   (if (<= max-points 0)
+     points
+     (let [new-points (if (= 0 (:out (first entry)))
+                        0
+                        (Math/abs (- max-points (:out (first entry)))))]
+       (recur
+        (+ points new-points)
+        (dec max-points)
+        (rest entry))))))
+
+(defn leader-board [entries contestants]
+  [:ul
+   (for [entry entries]
+     ^{:key (:id entry)} [:li.ui-state-default 
+                          [:div {:class "points"} (:name entry)
+                           [:div (calculate-points-for-entry (create-contestant-list entries (:id entry) contestants))]]])])
+
 (defn create-placed-list [placed]
   (into [] (sort #(compare (:out %2) (:out %1)) placed)))
 
@@ -69,8 +95,10 @@
                              (:name entry)])]
      [lister (create-contestant-list entries @selected-entry @contestants) "selected-entry"]])
 
+
 (defn home []
   [:div [:h2 "Phil & Will's Survivor 30 Bootlist"]
+   [leader-board @entries @contestants]
    [entries-display @entries selected-entry]
    [lister (create-placed-list  (filter #(not= 0 (:out %)) @contestants)) "placed"]
    [lister (filter #(= 0 (:out %)) @contestants) "contestants"]])

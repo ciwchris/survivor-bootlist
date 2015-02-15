@@ -58,3 +58,12 @@ select {
     border-color: #a80508;
     background: url('/images/ui-bg_gloss-wave_60_c11e21_500x100.png') repeat-x scroll 50% 50% #c11e21;
 }
+
+.points {
+    width: 100%;
+}
+
+.points > div {
+    float: right;
+    padding-right: 5px;
+}
