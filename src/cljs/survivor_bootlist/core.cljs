@@ -1,6 +1,6 @@
 (ns survivor-bootlist.core
-    (:require [reagent.core :as reagent :refer [atom]]
-              [cljsjs.react :as react]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [cljsjs.react :as react]))
 
 ;; -------------------------
 ;; State
@@ -26,6 +26,15 @@
                         {:id 18 :name "Will" :out 0 :tribe "nagarote"}
                         ]))
 
+(def entries (atom [
+                    {:id 1 :name "phil" :points 0 :order [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
+                    {:id 2 :name "will" :points 0 :order [2 1 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
+                    {:id 3 :name "ciwchris" :points 0 :order [3 1 2 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
+                    {:id 11 :name "last" :points 0 :order [3 1 2 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
+                    ]))
+
+(def selected-entry (atom 1))
+
 ;; -------------------------
 ;; Views
 
@@ -40,15 +49,29 @@
   [:ul {:id name :class "connectedSortable"}
    (for [item items]
      ^{:key (:id item)} [:li (create-class item)
-                          [:img {:src (str "/images/" (:name item) ".png")}]
-                          [:div (:name item)]])])
+                         [:img {:src (str "/images/" (:name item) ".png")}]
+                         [:div (:name item)]])])
 
 (defn create-placed-list [placed]
   (into [] (sort #(compare (:out %2) (:out %1)) placed)))
 
+(defn create-contestant-list [entries selected-entry contestants]
+  (let [contestant-order (:order (first (filter #(= selected-entry (:id %)) entries)))]
+    (map
+     #(first (filter (fn [contestant] (= (:id contestant) %)) contestants))
+     contestant-order)))
+
+(defn entries-display [entries selected-entry]
+    [:div
+     [:select {:on-change #(swap! selected-entry (fn [] (int (-> % .-target .-value))))}
+      (for [entry entries]
+        ^{:key (:id entry)} [:option {:value (:id entry)}
+                             (:name entry)])]
+     [lister (create-contestant-list entries @selected-entry @contestants) "selected-entry"]])
 
 (defn home []
   [:div [:h2 "Phil & Will's Survivor 30 Bootlist"]
+   [entries-display @entries selected-entry]
    [lister (create-placed-list  (filter #(not= 0 (:out %)) @contestants)) "placed"]
    [lister (filter #(= 0 (:out %)) @contestants) "contestants"]])
 
