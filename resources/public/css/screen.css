@@ -1,0 +1,46 @@
+ #placed, #contestants {
+    border: 1px solid #eee;
+    width: 212px;
+    min-height: 120px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+    //zoom: 1;
+}
+#placed li, #contestants li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    font-size: 1.8em;
+    width: 190px;
+    display: -ms-flex;
+    display: -webkit-flex;
+    display: flex;
+}
+
+li > div {
+    padding-left: 7px;
+    align-self: center;
+}
+
+
+.escameca {
+    color: #f0ffff;
+    border-color: #003f87;
+    background: url('/images/ui-bg_gloss-wave_60_0b58a0_500x100.png') repeat-x scroll 50% 50% #0b58a0;
+}
+
+.masaya {
+    background-color: #e9cc0e;
+    color: #fffff3;
+    border-color: #d0b300;
+    background: url('/images/ui-bg_gloss-wave_60_e9cc0e_500x100.png') repeat-x scroll 50% 50% #e9cc0e;
+}
+
+.nagarote {
+    background-color: #c11e21;
+    color: #ffeaed;
+    border-color: #a80508;
+    background: url('/images/ui-bg_gloss-wave_60_c11e21_500x100.png') repeat-x scroll 50% 50% #c11e21;
+}
