@@ -44,7 +44,7 @@
   :cljsbuild {:builds {:app {:source-paths ["src/cljs"]
                              :compiler {:output-to     "resources/public/js/app.js"
                                         :output-dir    "resources/public/js/out"
-                                        ;;:externs       ["react/externs/react.js"]
+                                        :externs       ["externs/jqueryui-sortable.js"]
                                         :asset-path   "js/out"
                                         :optimizations :none
                                         :pretty-print  true}}}}

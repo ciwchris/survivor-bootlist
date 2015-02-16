@@ -110,11 +110,11 @@
 
 (defn home []
   (let [entries (calculate-points-for-entries @entries @voted-out-list)]
-    [:div [:h1 "Phil & Will's Survivor World's Apart  Bootlist"]
+    [:div [:h1 "Phil & Will's Survivor World's Apart  Boot List"]
      [leader-board entries @contestants]
      [entries-display entries selected-entry]
      [:div.column
-      [:h3 "Voted out"]
+      [:h3 "Booted"]
       [lister (create-placed-list  (filter #(true? (:locked %)) @contestants)) "placed"]]
      [:div.column
       [:h3 "Players"]
