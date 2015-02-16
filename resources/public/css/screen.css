@@ -10,6 +10,27 @@
     //zoom: 1;
 }
 
+div.column {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div.column > select {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+body {
+    text-align: center;
+}
+
+ul {
+    display: inline-block;
+    padding: 5px 0;
+    margin-top: 0;
+    vertical-align: top;
+}
+
 li {
     margin: 0 5px 5px 5px;
     padding: 5px;
@@ -62,6 +83,7 @@ select {
 
 .points {
     width: 100%;
+    font-size: .62em;
 }
 
 .points > div {
