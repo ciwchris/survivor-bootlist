@@ -1,5 +1,9 @@
 body {
-  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
-  padding-top: 72px;
+  font-family: Survivant, 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  margin-top: 50px;
   -webkit-font-smoothing: antialiased;
+  background: url('/images/master_background.jpg') no-repeat scroll center top #fff;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
 }

@@ -25,19 +25,15 @@
                         {:id 17 :name "Vince" :out 0 :tribe "nagarote"}
                         {:id 18 :name "Will" :out 0 :tribe "nagarote"}
                         ]))
-
 (def voted-out-list (atom [
-                           {:id 1 :out 18}
                            ]))
 
 (def entries (atom [
-                    ;;{:id 1 :name "phil" :points 0 :order [18 17 16 15 14 13 12 11 1 10 9 8 7 6 5 4 3 2]}
-                    ;;{:id 2 :name "will" :points 0 :order [2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 1]}
-                    ;;{:id 3 :name "ciwchris" :points 0 :order [4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 1 2 3]}
-                    {:id 4 :name "last" :points 0 :order [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18]}
+                    {:id 1 :name "phil" :points 0 :order [15 8 5 11 3 2 12 16 18 13 1 6 7 10 9 4 17 14]}
+                    {:id 2 :name "will" :points 0 :order [8 5 11 2 15 18 3 1 12 16 7 14 17 6 13 10 9 4]}
                     ]))
 
-(def selected-entry (atom 4))
+(def selected-entry (atom 1))
 
 ;; -------------------------
 ;; To read the players when sorted
@@ -114,16 +110,15 @@
 
 (defn home []
   (let [entries (calculate-points-for-entries @entries @voted-out-list)]
-    [:div [:h2 "Phil & Will's Survivor 30 Bootlist"]
+    [:div [:h1 "Phil & Will's Survivor World's Apart  Bootlist"]
      [leader-board entries @contestants]
      [entries-display entries selected-entry]
      [:div.column
       [:h3 "Voted out"]
       [lister (create-placed-list  (filter #(true? (:locked %)) @contestants)) "placed"]]
      [:div.column
-      [:h3 "Active"]
+      [:h3 "Players"]
       [lister (filter #(= 0 (:out %)) @contestants) "contestants"]]]))
-
 
 (defn update-voted-out [new-placed-list]
   (let [new-sorted-list (map-indexed (fn [index item] (hash-map :id (int (.-id item)) :out (- 18 index))) new-placed-list)]
