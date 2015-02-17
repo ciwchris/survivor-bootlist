@@ -85,7 +85,7 @@
        entries-to-modify))
 
 (defn sorted-entries [entries]
-   (into [] (sort #(compare (:points %2) (:points %1)) entries)))
+   (into [] (sort #(compare (:points %1) (:points %2)) entries)))
 
 (defn leader-board [entries contestants]
   [:div.column
