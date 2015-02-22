@@ -18,7 +18,10 @@
                  [prone "0.8.0"]
                  [compojure "1.3.1"]
                  [selmer "0.8.0"]
-                 [environ "1.0.0"]]
+                 [environ "1.0.0"]
+                 [pani "0.0.3"]
+                 [cljsjs/firebase "2.1.2-1"]
+                 ]
 
   :plugins [
             [lein-cljsbuild "1.0.4"]

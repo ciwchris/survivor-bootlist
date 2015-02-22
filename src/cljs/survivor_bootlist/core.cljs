@@ -1,32 +1,16 @@
 (ns survivor-bootlist.core
   (:require [reagent.core :as reagent :refer [atom]]
+            [cljsjs.firebase]
             [cljsjs.react :as react]))
+
+(def fb-root (js/Firebase. "https://survivor.firebaseio.com"))
 
 ;; -------------------------
 ;; State
 
-(def contestants (atom [
-                        {:id 1 :name "Carolyn" :out 0 :tribe "masaya"}
-                        {:id 2 :name "Dan" :out 0 :tribe "escameca"}
-                        {:id 3 :name "Hali" :out 0 :tribe "nagarote"}
-                        {:id 4 :name "Jenn" :out 0 :tribe "nagarote"}
-                        {:id 5 :name "Joaquin" :out 0 :tribe "masaya"}
-                        {:id 6 :name "Joe" :out 0 :tribe "nagarote"}
-                        {:id 7 :name "Kelly" :out 0 :tribe "escameca"}
-                        {:id 8 :name "Lindsey" :out 0 :tribe "escameca"}
-                        {:id 9 :name "Max" :out 0 :tribe "masaya"}
-                        {:id 10 :name "Mike" :out 0 :tribe "escameca"}
-                        {:id 11 :name "Nina" :out 0 :tribe "nagarote"}
-                        {:id 12 :name "Rodney" :out 0 :tribe "escameca"}
-                        {:id 13 :name "Shirin" :out 0 :tribe "masaya"}
-                        {:id 14 :name "Sierra" :out 0 :tribe "escameca"}
-                        {:id 15 :name "So" :out 0 :tribe "masaya"}
-                        {:id 16 :name "Tyler" :out 0 :tribe "masaya"}
-                        {:id 17 :name "Vince" :out 0 :tribe "nagarote"}
-                        {:id 18 :name "Will" :out 0 :tribe "nagarote"}
-                        ]))
-(def voted-out-list (atom [
-                           ]))
+(def contestants (atom []))
+
+(def voted-out-list (atom []))
 
 (def entries (atom [
                     {:id 1 :name "phil" :points 0 :order [15 8 5 11 3 2 12 16 18 13 1 6 7 10 9 4 17 14]}
@@ -35,11 +19,52 @@
 
 (def selected-entry (atom 1))
 
+;; ------------------------
+;; Retrieve Contestants from Firebase
+(defn created-voted-out [voted-out players]
+  (if (empty? players)
+    voted-out
+    (let [p (first players)]
+      (recur
+       (if (= 0 (int (:out p)))
+         voted-out
+         (conj voted-out {:id (int (:id p)) :out (int (:out p))}))
+         (rest players)))))
+
+(defn create-player [player]
+  {:id (get player "id")
+   :name (get player "name")
+   :out (get player "out")
+   :tribe (get player "tribe")
+   :locked (not= 0 (get player "out"))})
+
+(defn create-players
+  ([players] (create-players players []))
+  ([players created-players]
+   (if (empty? players)
+     (do
+       (swap! contestants (fn [] (into [] created-players)))
+       (swap! voted-out-list (fn [] (into [] (created-voted-out [] created-players))))
+       nil)
+     (recur
+      (rest players)
+      (conj created-players (create-player (first players)))))))
+
+(defn retrieve-players []
+  (.once fb-root "value" #(-> %
+                              .val
+                              js->clj
+                              (get "players")
+                              create-players))
+  contestants)
+
 ;; -------------------------
 ;; To read the players when sorted
 (extend-type js/NodeList
   ISeqable
   (-seq [array] (array-seq array 0)))
+
+(enable-console-print!)
 
 ;; -------------------------
 ;; Views
@@ -99,20 +124,21 @@
 (defn create-placed-list [placed]
   (into [] (sort #(compare (:out %2) (:out %1)) placed)))
 
-(defn entries-display [entries selected-entry]
+(defn entries-display [entries selected-entry contestants]
   [:div.column
    [:h3 "Entries"]
    [:select {:on-change #(swap! selected-entry (fn [] (int (-> % .-target .-value))))}
     (for [entry entries]
       ^{:key (:id entry)} [:option {:value (:id entry)}
                            (:name entry)])]
-   [lister (create-contestant-list entries @selected-entry @contestants) "selected-entry"]])
+   (if (not (empty? contestants))
+     [lister (create-contestant-list entries @selected-entry contestants) "selected-entry"])])
 
-(defn home []
+(defn home [contestants]
   (let [entries (calculate-points-for-entries @entries @voted-out-list)]
     [:div [:h1 "Phil & Will's Survivor World's Apart  Boot List"]
      [leader-board entries @contestants]
-     [entries-display entries selected-entry]
+     [entries-display entries selected-entry @contestants]
      [:div.column
       [:h3 "Booted"]
       [lister (create-placed-list  (filter #(true? (:locked %)) @contestants)) "placed"]]
@@ -137,11 +163,12 @@
                                                 }))
           (.disableSelection (js/$ "#placed")))))
 
-
-(defn home-component []
-  (reagent/create-class {:render home
+(defn home-component [contestants]
+  (reagent/create-class {:reagent-render (fn [contestants] (home contestants))
+                         :display-name "home-component"
+                         :get-initial-state retrieve-players
                          :component-did-mount home-did-mount}))
 ;; -------------------------
 ;; Initialize app
 (defn init! []
-  (reagent/render-component [home-component] (.getElementById js/document "app")))
+  (reagent/render-component [home-component contestants] (.getElementById js/document "app")))
