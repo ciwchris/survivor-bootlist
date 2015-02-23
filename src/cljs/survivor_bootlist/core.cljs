@@ -134,17 +134,33 @@
    (if (not (empty? contestants))
      [lister (create-contestant-list entries @selected-entry contestants) "selected-entry"])])
 
+(defn rand-loader []
+  (let [tribes ["escameca" "nagarote" "masaya"]]
+    (nth tribes (-> tribes
+                    count
+                    rand
+                    int))))
+
+(defn loader []
+  [:div.loader
+   [:div {:class (str "uil-facebook-css " (rand-loader)) :style {:-webkit-transform "scale(0.6)"}}
+    [:div]
+    [:div]
+    [:div]]])
+
 (defn home [contestants]
-  (let [entries (calculate-points-for-entries @entries @voted-out-list)]
-    [:div [:h1 "Phil & Will's Survivor World's Apart  Boot List"]
-     [leader-board entries @contestants]
-     [entries-display entries selected-entry @contestants]
-     [:div.column
-      [:h3 "Booted"]
-      [lister (create-placed-list  (filter #(true? (:locked %)) @contestants)) "placed"]]
-     [:div.column
-      [:h3 "Players"]
-      [lister (filter #(= 0 (:out %)) @contestants) "contestants"]]]))
+  (if (empty? @contestants)
+    [loader]
+    (let [entries (calculate-points-for-entries @entries @voted-out-list)]
+      [:div [:h1 "Phil & Will's Survivor World's Apart  Boot List"]
+       [leader-board entries @contestants]
+       [entries-display entries selected-entry @contestants]
+       [:div.column
+        [:h3 "Booted"]
+        [lister (create-placed-list  (filter #(true? (:locked %)) @contestants)) "placed"]]
+       [:div.column
+        [:h3 "Players"]
+        [lister (filter #(= 0 (:out %)) @contestants) "contestants"]]])))
 
 (defn update-voted-out [new-placed-list]
   (let [new-sorted-list (map-indexed (fn [index item] (hash-map :id (int (.-id item)) :out (- 18 index))) new-placed-list)]
