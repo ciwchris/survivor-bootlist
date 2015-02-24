@@ -1,6 +1,8 @@
 (ns survivor-bootlist.core
   (:require [reagent.core :as reagent :refer [atom]]
             [cljsjs.firebase]
+            [cljsjs.jquery]
+            [cljsjs.jquery-ui]
             [cljsjs.react :as react]))
 
 (def fb-root (js/Firebase. "https://survivor.firebaseio.com"))
