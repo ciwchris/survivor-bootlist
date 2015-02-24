@@ -183,7 +183,7 @@
   (reagent/create-class {:reagent-render (fn [contestants] (home contestants))
                          :display-name "home-component"
                          :get-initial-state retrieve-players
-                         :component-did-mount home-did-mount}))
+                         :component-did-update home-did-mount}))
 ;; -------------------------
 ;; Initialize app
 (defn init! []
