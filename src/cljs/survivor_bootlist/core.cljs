@@ -1,7 +1,6 @@
 (ns survivor-bootlist.core
   (:require [reagent.core :as reagent :refer [atom]]
             [cljsjs.firebase]
-            [cljsjs.jquery]
             [cljsjs.jquery-ui]
             [cljsjs.react :as react]))
 
