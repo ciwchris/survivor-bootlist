@@ -9,6 +9,10 @@
     margin-right: 10px;
 }
 
+#leaderboard {
+    width: 210px;
+}
+
 div.column {
     display: inline-block;
     vertical-align: top;
